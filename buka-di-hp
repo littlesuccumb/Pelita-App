@@ -1,0 +1,43 @@
+{
+    "$schema": "https://json.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "start": "concurrently \"php artisan serve --host=0.0.0.0 --port=8000\" \"vite --host\" --names \"php,vite\" --kill-others",
+
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "devDependencies": {
+        "@tailwindcss/forms": "^0.5.2",
+        "@tailwindcss/vite": "^4.0.0",
+        "alpinejs": "^3.4.2",
+        "autoprefixer": "^10.4.21",
+        "axios": "^1.11.0",
+        "concurrently": "^9.2.1",
+        "laravel-vite-plugin": "^2.0.0",
+        "postcss": "^8.5.6",
+        "tailwindcss": "^3.4.17",
+        "vite": "^7.0.4"
+    }
+}
+
+
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+
+export default defineConfig({
+  server: {
+    host: true,           
+    port: 5173,  
+    hmr: {
+      host: '192.168.1.13',  
+    },
+  },
+  plugins: [
+    laravel({
+      input: ['resources/css/app.css', 'resources/js/app.js'],
+      refresh: true,
+    }),
+  ],
+});

@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Everest 3D dengan Animasi Sesar Lembang</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400&display=swap" rel="stylesheet">
+    <style>
+        * {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #112B3C;
+  height: 100%;
+}
+
+body:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  box-shadow: 0 0 50px rgba(0,0,0,0.3) inset;
+  pointer-events: none;
+}
+
+@media (min-width: 750px) {
+  body:after {
+    box-shadow: 0 0 100px rgba(0,0,0,0.3) inset;
+  }
+}
+
+canvas {
+  position: absolute;
+  touch-action: none;
+}
+
+.ui {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 105;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.ui label {
+  display: grid;
+  grid-template-columns: 0 1fr 1fr;
+  align-items: center;
+  background: #EFEFEF;
+  border-radius: 10px;
+  padding: 8px;
+  width: 36px;
+  overflow: hidden;
+  transition: 0.15s ease-in-out;
+  font-size: 0;
+}
+
+.ui label + label {
+  margin-top: 5px;
+}
+
+.ui label:focus-within,
+.ui label:hover {
+  width: 146px;
+}
+
+.ui label:focus-within input,
+.ui label:hover input {
+  margin-left: 10px;
+  opacity: 1;
+}
+
+.ui input {
+  width: 100px;
+  opacity: 0;
+}
+
+.ui svg {
+  flex-shrink: 0;
+  width: 20px;
+}
+
+.tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0;
+  width: 0;
+  z-index: 1;
+}
+
+.tooltip path:first-child {
+  transition: 0.05s ease-out;
+}
+
+.tooltip:focus-within,
+.tooltip:hover {
+  z-index: 2;
+}
+
+.tooltip:focus-within path:first-child,
+.tooltip:hover path:first-child {
+  fill: #f48f4b;
+}
+
+p {
+  white-space: nowrap;
+  color: white;
+  background: #EFEFEF;
+  color: #112B3C;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -90px);
+  border-radius: 3px;
+  padding: 5px 8px;
+  pointer-events: none;
+  opacity: 0;
+  transition: 0.15s ease-out;
+  font-weight: 400;
+  font-family: 'Oswald', sans-serif;
+}
+
+button:focus + p,
+button:hover + p {
+  opacity: 1;
+}
+
+button {
+  background: none;
+  padding: 0;
+  border: none;
+  height: 0;
+  cursor: pointer;
+}
+
+button svg {
+  width: 20px;
+  margin-left: -10px;
+  transform: translateY(-100%);
+}
+
+#compass {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 50px;
+  z-index: 120;
+  overflow: visible;
+}
+
+#compass path:first-child {
+  stroke: #112b3c;
+  stroke-width: 4px;
+}
+
+/* ========== STYLE UNTUK ANIMASI SESAR LEMBANG ========== */
+#sesar-button {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #F66B0E;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 115;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+#sesar-button:hover {
+  background: #205375;
+  transform: translateX(-50%) scale(1.05);
+}
+
+#sesar-animation {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 300px;
+  z-index: 110;
+  pointer-events: none;
+  display: none;
+}
+
+#sesar-animation svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+}
+
+#info-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: #205375;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 115;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+#info-button:hover {
+  background: #F66B0E;
+  transform: scale(1.05);
+}
+
+#info-sesar {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(17, 43, 60, 0.95);
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  max-width: 350px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  z-index: 110;
+  border-left: 4px solid #F66B0E;
+  display: none;
+  margin-top: 50px;
+}
+
+#info-sesar h3 {
+  margin: 0 0 10px 0;
+  color: #F66B0E;
+}
+
+#info-sesar p {
+  position: relative;
+  margin: 8px 0;
+  opacity: 1;
+  transform: none;
+  left: 0;
+  top: 0;
+  background: none;
+  color: white;
+  padding: 0;
+  white-space: normal;
+  pointer-events: auto;
+}
+
+@keyframes getar {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+#garis-sesar {
+  animation: getar 0.3s infinite;
+}
+
+#label-sesar {
+  animation: getar 0.5s infinite;
+}
+    </style>
+</head>
+<body>
+   <!-- Marker by Valeriy from NounProject.com -->
+<!-- Compass by GreenHill from NounProject.com -->
+<div class="tooltip summit" id="everest">
+  <button><svg viewBox="0 0 42.4 74.3" fill="#112B3C"><path fill="#EFEFEF" d="M39.9,18.2C38.2,11.1,30.7,3.9,23.3,2.3,13.4.2,5.1,8.2,2.8,16.9S2.5,31.8,5.1,38.6C9.5,50.4,16.4,61.3,22.3,72.4h0c4.8-11.1,10.2-21.9,14.3-33.3C38.9,32.6,41.5,25.2,39.9,18.2Zm-20,17.4-.9-.2c-3.6,1.2-8-2.3-8.9-6.3-1.5-6,1.3-12.9,7.6-14.5h0c6.2-1.7,12,2.9,12.7,9.1S25.9,35,19.9,35.6Z"/><path d="M20.2,0C7,.1-.3,13.2,0,25,.4,42,12.5,60.5,22,73.9a.7.7,0,0,0,1.2-.6h0a1.1,1.1,0,0,0,1.3-.5A181.4,181.4,0,0,0,35.6,48.1c3.1-7.7,6.8-16.1,6.8-24.6C42.4,12,32.2,0,20.2,0Zm2.1,71.5C16.7,60.6,10,50.1,5.8,38.6,3.4,31.9,1.9,24.5,3.7,17.4S13.8,1.1,23.2,3.2C30.3,4.7,37.5,11.8,39,18.7s-.9,14-3.1,20.3C32,50.1,26.8,60.7,22.3,71.5Z"/><path d="M17.7,14.6c-6.3,1.6-9.1,8.5-7.6,14.5.9,4,5.3,7.5,8.9,6.3l.9.2c6-.6,11.2-5.5,10.5-11.9s-6.5-10.8-12.7-9.1Zm2.2,18.1a1.4,1.4,0,0,0-1.1.6c-3.7.3-6.2-3.9-6-7.6s2.6-8.3,7.2-8.5a7.5,7.5,0,0,1,7.5,6.9c.4,4.5-3.3,8.1-7.6,8.6Z"/></svg></button>
+  <p>Everest - 8 848 m</p>
+</div>
+
+<div class="tooltip summit" id="lhotse">
+  <button><svg viewBox="0 0 42.4 74.3" fill="#112B3C"><path fill="#EFEFEF" d="M39.9,18.2C38.2,11.1,30.7,3.9,23.3,2.3,13.4.2,5.1,8.2,2.8,16.9S2.5,31.8,5.1,38.6C9.5,50.4,16.4,61.3,22.3,72.4h0c4.8-11.1,10.2-21.9,14.3-33.3C38.9,32.6,41.5,25.2,39.9,18.2Zm-20,17.4-.9-.2c-3.6,1.2-8-2.3-8.9-6.3-1.5-6,1.3-12.9,7.6-14.5h0c6.2-1.7,12,2.9,12.7,9.1S25.9,35,19.9,35.6Z"/><path d="M20.2,0C7,.1-.3,13.2,0,25,.4,42,12.5,60.5,22,73.9a.7.7,0,0,0,1.2-.6h0a1.1,1.1,0,0,0,1.3-.5A181.4,181.4,0,0,0,35.6,48.1c3.1-7.7,6.8-16.1,6.8-24.6C42.4,12,32.2,0,20.2,0Zm2.1,71.5C16.7,60.6,10,50.1,5.8,38.6,3.4,31.9,1.9,24.5,3.7,17.4S13.8,1.1,23.2,3.2C30.3,4.7,37.5,11.8,39,18.7s-.9,14-3.1,20.3C32,50.1,26.8,60.7,22.3,71.5Z"/><path d="M17.7,14.6c-6.3,1.6-9.1,8.5-7.6,14.5.9,4,5.3,7.5,8.9,6.3l.9.2c6-.6,11.2-5.5,10.5-11.9s-6.5-10.8-12.7-9.1Zm2.2,18.1a1.4,1.4,0,0,0-1.1.6c-3.7.3-6.2-3.9-6-7.6s2.6-8.3,7.2-8.5a7.5,7.5,0,0,1,7.5,6.9c.4,4.5-3.3,8.1-7.6,8.6Z"/></svg></button>
+  <p>Lhotse - 8 516 m</p>
+</div>
+<div class="tooltip summit" id="lhotseshar">
+  <button><svg viewBox="0 0 42.4 74.3" fill="#112B3C"><path fill="#EFEFEF" d="M39.9,18.2C38.2,11.1,30.7,3.9,23.3,2.3,13.4.2,5.1,8.2,2.8,16.9S2.5,31.8,5.1,38.6C9.5,50.4,16.4,61.3,22.3,72.4h0c4.8-11.1,10.2-21.9,14.3-33.3C38.9,32.6,41.5,25.2,39.9,18.2Zm-20,17.4-.9-.2c-3.6,1.2-8-2.3-8.9-6.3-1.5-6,1.3-12.9,7.6-14.5h0c6.2-1.7,12,2.9,12.7,9.1S25.9,35,19.9,35.6Z"/><path d="M20.2,0C7,.1-.3,13.2,0,25,.4,42,12.5,60.5,22,73.9a.7.7,0,0,0,1.2-.6h0a1.1,1.1,0,0,0,1.3-.5A181.4,181.4,0,0,0,35.6,48.1c3.1-7.7,6.8-16.1,6.8-24.6C42.4,12,32.2,0,20.2,0Zm2.1,71.5C16.7,60.6,10,50.1,5.8,38.6,3.4,31.9,1.9,24.5,3.7,17.4S13.8,1.1,23.2,3.2C30.3,4.7,37.5,11.8,39,18.7s-.9,14-3.1,20.3C32,50.1,26.8,60.7,22.3,71.5Z"/><path d="M17.7,14.6c-6.3,1.6-9.1,8.5-7.6,14.5.9,4,5.3,7.5,8.9,6.3l.9.2c6-.6,11.2-5.5,10.5-11.9s-6.5-10.8-12.7-9.1Zm2.2,18.1a1.4,1.4,0,0,0-1.1.6c-3.7.3-6.2-3.9-6-7.6s2.6-8.3,7.2-8.5a7.5,7.5,0,0,1,7.5,6.9c.4,4.5-3.3,8.1-7.6,8.6Z"/></svg></button>
+  <p>Lhotse Shar - 8 382 m</p>
+</div>
+<div class="tooltip summit" id="nuptse">
+  <button><svg viewBox="0 0 42.4 74.3" fill="#112B3C"><path fill="#EFEFEF" d="M39.9,18.2C38.2,11.1,30.7,3.9,23.3,2.3,13.4.2,5.1,8.2,2.8,16.9S2.5,31.8,5.1,38.6C9.5,50.4,16.4,61.3,22.3,72.4h0c4.8-11.1,10.2-21.9,14.3-33.3C38.9,32.6,41.5,25.2,39.9,18.2Zm-20,17.4-.9-.2c-3.6,1.2-8-2.3-8.9-6.3-1.5-6,1.3-12.9,7.6-14.5h0c6.2-1.7,12,2.9,12.7,9.1S25.9,35,19.9,35.6Z"/><path d="M20.2,0C7,.1-.3,13.2,0,25,.4,42,12.5,60.5,22,73.9a.7.7,0,0,0,1.2-.6h0a1.1,1.1,0,0,0,1.3-.5A181.4,181.4,0,0,0,35.6,48.1c3.1-7.7,6.8-16.1,6.8-24.6C42.4,12,32.2,0,20.2,0Zm2.1,71.5C16.7,60.6,10,50.1,5.8,38.6,3.4,31.9,1.9,24.5,3.7,17.4S13.8,1.1,23.2,3.2C30.3,4.7,37.5,11.8,39,18.7s-.9,14-3.1,20.3C32,50.1,26.8,60.7,22.3,71.5Z"/><path d="M17.7,14.6c-6.3,1.6-9.1,8.5-7.6,14.5.9,4,5.3,7.5,8.9,6.3l.9.2c6-.6,11.2-5.5,10.5-11.9s-6.5-10.8-12.7-9.1Zm2.2,18.1a1.4,1.4,0,0,0-1.1.6c-3.7.3-6.2-3.9-6-7.6s2.6-8.3,7.2-8.5a7.5,7.5,0,0,1,7.5,6.9c.4,4.5-3.3,8.1-7.6,8.6Z"/></svg></button>
+  <p>Nuptse - 7 861 m</p>
+</div>
+<div class="tooltip summit" id="changtse">
+  <button><svg viewBox="0 0 42.4 74.3" fill="#112B3C"><path fill="#EFEFEF" d="M39.9,18.2C38.2,11.1,30.7,3.9,23.3,2.3,13.4.2,5.1,8.2,2.8,16.9S2.5,31.8,5.1,38.6C9.5,50.4,16.4,61.3,22.3,72.4h0c4.8-11.1,10.2-21.9,14.3-33.3C38.9,32.6,41.5,25.2,39.9,18.2Zm-20,17.4-.9-.2c-3.6,1.2-8-2.3-8.9-6.3-1.5-6,1.3-12.9,7.6-14.5h0c6.2-1.7,12,2.9,12.7,9.1S25.9,35,19.9,35.6Z"/><path d="M20.2,0C7,.1-.3,13.2,0,25,.4,42,12.5,60.5,22,73.9a.7.7,0,0,0,1.2-.6h0a1.1,1.1,0,0,0,1.3-.5A181.4,181.4,0,0,0,35.6,48.1c3.1-7.7,6.8-16.1,6.8-24.6C42.4,12,32.2,0,20.2,0Zm2.1,71.5C16.7,60.6,10,50.1,5.8,38.6,3.4,31.9,1.9,24.5,3.7,17.4S13.8,1.1,23.2,3.2C30.3,4.7,37.5,11.8,39,18.7s-.9,14-3.1,20.3C32,50.1,26.8,60.7,22.3,71.5Z"/><path d="M17.7,14.6c-6.3,1.6-9.1,8.5-7.6,14.5.9,4,5.3,7.5,8.9,6.3l.9.2c6-.6,11.2-5.5,10.5-11.9s-6.5-10.8-12.7-9.1Zm2.2,18.1a1.4,1.4,0,0,0-1.1.6c-3.7.3-6.2-3.9-6-7.6s2.6-8.3,7.2-8.5a7.5,7.5,0,0,1,7.5,6.9c.4,4.5-3.3,8.1-7.6,8.6Z"/></svg></button>
+  <p>Changtse - 7 543 m</p>
+</div>
+
+<div class="ui">
+  <label>Update wireframe opacity<svg viewBox="0 0 97.2 97.2" fill="#112B3C"><path d="M71.5,73.8A53.6,53.6,0,0,1,60.4,90.1,41.2,41.2,0,0,0,79.6,78.6a74.9,74.9,0,0,0-8.1-4.8Zm-45.2-.6a56,56,0,0,0-8.9,5.2,41.4,41.4,0,0,0,21,12.2A53.5,53.5,0,0,1,26.3,73.2ZM51,68.6V90.2A50.5,50.5,0,0,0,65.7,71.4,50.3,50.3,0,0,0,51,68.6Zm-5.5,0a46.7,46.7,0,0,0-13.3,2.5A51.9,51.9,0,0,0,45.5,88.7ZM76.7,52.4a54.3,54.3,0,0,1-3.2,16.5A48.3,48.3,0,0,1,83,74.7a42.6,42.6,0,0,0,8.6-22.3ZM51,52.4V63.3a56.2,56.2,0,0,1,16.7,3.2,51.1,51.1,0,0,0,2.7-14.1Zm-23.6,0a49.1,49.1,0,0,0,2.8,13.7,53.6,53.6,0,0,1,15.3-2.8V52.4Zm-21.9,0a43,43,0,0,0,8.4,22.1,61.2,61.2,0,0,1,10.3-6.2,53.4,53.4,0,0,1-3.1-15.9ZM30.3,31.6a46.6,46.6,0,0,0-2.9,15.2H45.5V34.3a60.7,60.7,0,0,1-15.2-2.7ZM67,31a59,59,0,0,1-16.1,3.2V46.8H70.3A49.5,49.5,0,0,0,67,31ZM13.6,23.3A41.9,41.9,0,0,0,5.4,46.8H21a60.1,60.1,0,0,1,3.2-17.4a56.8,56.8,0,0,1-10.6-6.1Zm69.3-.8a45.3,45.3,0,0,1-10.1,6.1,56.3,56.3,0,0,1,3.8,18.2h15a41.8,41.8,0,0,0-8.7-24.3ZM45.5,9.3A49.9,49.9,0,0,0,32.3,26.6a53.6,53.6,0,0,0,13.2,2.2ZM51,9V28.7a50.3,50.3,0,0,0,13.8-2.6A48.6,48.6,0,0,0,51,9ZM39.2,6.4A43.1,43.1,0,0,0,17.1,19a41.1,41.1,0,0,0,9.3,5.4,59.3,59.3,0,0,1,12.8-18Zm18.6,0A60.2,60.2,0,0,1,70.7,23.7a44.7,44.7,0,0,0,8.8-5.3,42.8,42.8,0,0,0-21.7-12ZM48.6,0A48.6,48.6,0,0,1,51,97.1H45.5A48.5,48.5,0,0,1,.2,52.4H0V46.8H.1A48.4,48.4,0,0,1,48.6,0Z"/></svg><input id="wireframe" type="range" min="0" max="100" step="5" value="10"></label>
+  
+  <label>Update fill opacity<svg viewBox="0 0 97.2 97.2" fill="#112B3C"><path  d="M48.6,0A48.6,48.6,0,0,1,51,97.1H45.5A48.5,48.5,0,0,1,.2,52.4H0V46.8H.1A48.4,48.4,0,0,1,48.6,0Z"/></svg><input id="fill" type="range" min="0" max="100" step="5" value="100"></label>
+</div>
+
+<svg id="compass" viewBox="0 0 151.5 151.5"><path fill="#EFEFEF" d="M19.1,25.4A75.9,75.9,0,0,0,20,127.1l5.4-5.5a4.2,4.2,0,0,1,2.6-1.2,3.9,3.9,0,0,1,2.7,1.1,4,4,0,0,1,1.2,2.7,3.9,3.9,0,0,1-1.1,2.7l-5.4,5.5a75.8,75.8,0,0,0,101.6-.9l-5.5-5.4a3.9,3.9,0,0,1-1.1-2.7,4,4,0,0,1,1.1-2.7,3.9,3.9,0,0,1,2.7-1.1,4,4,0,0,1,2.7,1.1l5.4,5.4a75.8,75.8,0,0,0-.8-101.7L126.1,30a3.9,3.9,0,0,1-2.7,1.1,4,4,0,0,1-2.7-1.1,3.9,3.9,0,0,1-1.1-2.7,3.6,3.6,0,0,1,1.1-2.6l5.4-5.6A75.9,75.9,0,0,0,24.4,20L30,25.4h0a3.8,3.8,0,0,1-2.7,6.5,3.6,3.6,0,0,1-2.6-1.1l-5.6-5.4ZM72.5,11.6l.2-.3a3.6,3.6,0,0,1,3.4-.9,3.5,3.5,0,0,1,2.6,2.5L95.4,74.7a2.8,2.8,0,0,1,0,1.8L79.7,138.6h0a3.6,3.6,0,0,1-6.9,0L56,76.8A5.4,5.4,0,0,1,56,75L71.8,12.9a2.4,2.4,0,0,1,.7-1.3Z"/><path fill="#EFEFEF" d="M64.1,79.4l23.3-.2L76.1,123.7Z"/></svg> 
+
+<!-- ELEMEN UNTUK ANIMASI SESAR LEMBANG -->
+<button id="sesar-button">🔍 Lihat Ilustrasi Sesar Lembang</button>
+<button id="info-button">ℹ️ Info Sesar Lembang</button>
+
+<div id="sesar-animation">
+  <svg viewBox="0 0 800 300">
+    <!-- Lapisan tanah -->
+    <rect id="tanah-atas" x="50" y="50" width="700" height="100" fill="#8B4513" stroke="#654321" stroke-width="2"/>
+    <rect id="tanah-bawah" x="50" y="150" width="700" height="100" fill="#8B4513" stroke="#654321" stroke-width="2"/>
+    
+    <!-- Garis sesar -->
+    <line id="garis-sesar" x1="400" y1="50" x2="400" y2="250" stroke="#FF0000" stroke-width="4" stroke-dasharray="10,5"/>
+    <path id="arah-pergerakan" d="M400,50 L380,70 L420,70 Z" fill="#FF0000"/>
+    <path id="arah-pergerakan-bawah" d="M400,250 L380,230 L420,230 Z" fill="#FF0000"/>
+    
+    <!-- Blok-blok tektonik -->
+    <g id="blok-kanan">
+      <rect x="400" y="50" width="350" height="100" fill="#A0522D" stroke="#8B4513" stroke-width="2"/>
+      <rect x="400" y="150" width="350" height="100" fill="#A0522D" stroke="#8B4513" stroke-width="2"/>
+      <text x="575" y="120" text-anchor="middle" fill="white" font-family="Oswald" font-size="18">Blok Barat</text>
+    </g>
+    
+    <g id="blok-kiri">
+      <rect x="50" y="50" width="350" height="100" fill="#CD853F" stroke="#8B4513" stroke-width="2"/>
+      <rect x="50" y="150" width="350" height="100" fill="#CD853F" stroke="#8B4513" stroke-width="2"/>
+      <text x="225" y="120" text-anchor="middle" fill="white" font-family="Oswald" font-size="18">Blok Timur</text>
+    </g>
+    
+    <!-- Anotasi -->
+    <text id="label-sesar" x="400" y="280" text-anchor="middle" fill="#FF0000" font-family="Oswald" font-size="20" font-weight="bold">SESAR LEMBANG</text>
+    <text id="label-pergerakan" x="400" y="40" text-anchor="middle" fill="#EFEFEF" font-family="Oswald" font-size="16">Pergerakan Horizontal</text>
+    
+    <!-- Panah pergerakan -->
+    <g id="panah-kiri">
+      <line x1="200" y1="200" x2="100" y2="200" stroke="#F66B0E" stroke-width="3" marker-end="url(#arrow)"/>
+      <text x="150" y="190" text-anchor="middle" fill="#F66B0E" font-family="Oswald" font-size="14">Geser ke Barat</text>
+    </g>
+    
+    <g id="panah-kanan">
+      <line x1="600" y1="200" x2="700" y2="200" stroke="#205375" stroke-width="3" marker-end="url(#arrow)"/>
+      <text x="650" y="190" text-anchor="middle" fill="#205375" font-family="Oswald" font-size="14">Geser ke Timur</text>
+    </g>
+    
+    <!-- Marker definitions -->
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#F66B0E"/>
+      </marker>
+    </defs>
+  </svg>
+</div>
+
+<div id="info-sesar">
+  <h3>SESAR LEMBANG</h3>
+  <p>✔️ Sesar geser (strike-slip) aktif sepanjang 29 km</p>
+  <p>✔️ Membentang dari Padalarang hingga Cisarua</p>
+  <p>✔️ Laju pergeseran: 1.95-3.45 mm/tahun</p>
+  <p>✔️ Ancaman gempa hingga M 6.8</p>
+  <p>✔️ Blok Barat bergerak relatif ke Timur</p>
+  <p>✔️ Blok Timur bergerak relatif ke Barat</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"></script>
+<script type="module">
+    import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
+import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/DRACOLoader.js';
+import gsap from 'https://cdn.skypack.dev/gsap@3.10.4';
+console.clear();
+
+let points = {
+  everest: new THREE.Vector3(-37.86,33,3.2),
+  lhotseshar: new THREE.Vector3(-19.86,29,36.57),
+  nuptse: new THREE.Vector3(-75.49,23,26.36),
+  changtse: new THREE.Vector3(-47.68,19.66,-37.55),
+  lhotse: new THREE.Vector3(-28.86,29.5,32.85)
+};
+let elTooltips = {
+  everest: document.querySelector('#everest'),
+  lhotseshar: document.querySelector('#lhotseshar'),
+  nuptse: document.querySelector('#nuptse'),
+  changtse: document.querySelector('#changtse'),
+  lhotse: document.querySelector('#lhotse')
+};
+let elWireframe = document.querySelector('#wireframe');
+let elFill = document.querySelector('#fill');
+let elCompass = document.querySelector('#compass');
+let gradient = chroma.scale(['#EFEFEF','#F66B0E','#205375','#112B3C','#112B3C']);
+if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  gradient = chroma.scale(['#112B3C','#205375', '#F66B0E', '#EFEFEF', '#EFEFEF']);
+}
+
+/* SETUP */
+const scene = new THREE.Scene();
+if (!window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  scene.fog = new THREE.Fog(0x112B3C, 250, 350);
+}
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000);
+camera.position.y = 30;
+camera.position.x = -60;
+camera.position.z = 110;
+const group = new THREE.Group();
+scene.add(group);
+
+// Center the scene on the Everest
+gsap.set(group.position, {
+  x: -points.everest.x,
+  y: 0,
+  z: -points.everest.z
+});
+
+const renderer = new THREE.WebGLRenderer({
+  antialias: true
+});
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setClearColor(0x112B3C);
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+/* CONTROLS */
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.enablePan = false;
+controls.maxPolarAngle = 2;
+controls.minDistance = 50;
+controls.maxDistance = 180;
+
+/* Handle auto rotation of the scene */
+let rotationTimeout = null;
+let firstChange = true;
+controls.addEventListener('change', () => {
+  if (firstChange) {
+    firstChange = false;
+    return;
+  }
+  gsap.to(autoRotation, {
+    timeScale: 0,
+    duration: 0.2
+  });
+  rotationTimeout = window.clearTimeout(rotationTimeout);
+  rotationTimeout = window.setTimeout(afterControlChange, 800);
+});
+
+function afterControlChange () {
+  gsap.to(autoRotation, {
+    timeScale: 1,
+    duration: 1,
+    ease: 'power2.out'
+  });
+}
+
+const autoRotation = gsap.to(scene.rotation, {
+  y: Math.PI * 2,
+  ease: 'none',
+  duration: 80,
+  repeat: -1
+});
+
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.140.0/examples/js/libs/draco/');
+const loader = new GLTFLoader();
+loader.setDRACOLoader(dracoLoader);
+let ground;
+let ground2;
+loader.load('https://mamboleoo.be/CodePen/random/Brussels/everest.glb', setup);
+
+function setup (model) {
+  const geom = model.scene.children[0];
+  geom.geometry.scale(-1,-1,1);
+  
+  ground = new THREE.Mesh(geom.geometry, new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    side: 2,
+    vertexColors: true,
+    transparent: true,
+    opacity: (parseInt(elFill.value) / 100)
+  }));
+  const colors = [];
+  let maxY = 0;
+  let minY = 0;
+  for (let i =0;i < ground.geometry.attributes.position.count;i++) {
+    let y = ground.geometry.attributes.position.getY(i);
+    if (y > maxY) {
+      maxY = y;
+    }
+    if (y < minY) {
+      minY = y;
+    }
+    y -= 26;
+    y /= -85;
+    let rgb = gradient(y).rgb();
+    colors.push(rgb[0]/255, rgb[1]/255, rgb[2]/255);
+  }
+  ground.geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+  group.add(ground);
+  
+  ground2 = ground.clone();
+  ground2.material = ground.material.clone();
+  ground2.material.color.set(0x000000);
+  ground2.material.opacity = parseInt(elWireframe.value) / 100;
+  ground2.material.wireframe = true;
+  group.add(ground2);
+  
+  elWireframe.addEventListener('input', () => {
+    gsap.to(ground2.material, {
+      opacity: parseInt(elWireframe.value) / 100,
+      duration: 0.4,
+      ease: 'power1.out'
+    });
+  });
+  elFill.addEventListener('input', () => {
+    gsap.to(ground.material, {
+      opacity: (parseInt(elFill.value) / 100),
+      duration: 0.4,
+      ease: 'power1.out'
+    });
+    ground2.material.color.setHSL(0, 0, 1 - (parseInt(elFill.value) / 100));
+  });
+}
+
+// Center the camera to the clicked tooltip
+for (let tooltip in elTooltips) {
+  elTooltips[tooltip].addEventListener('click', () => {
+    gsap.to(group.position, {
+      x: -points[tooltip].x,
+      y: 0,
+      z: -points[tooltip].z,
+      duration: 1.5,
+      ease: 'power2.out'
+    });
+  });
+}
+
+function projectTooltips () {
+  for (let point in points) {
+    const projection = points[point].clone();
+    projection.applyMatrix4(group.matrix);
+    projection.applyMatrix4(scene.matrix);
+    projection.project(camera);
+    projection.x = (projection.x * window.innerWidth/2) + window.innerWidth/2;
+    projection.y = -(projection.y * window.innerHeight/2) + window.innerHeight/2;
+    elTooltips[point].style.transform = `translate3d(${projection.x}px, ${projection.y}px, 0)`;
+    elTooltips[point].style.zIndex = 100 - Math.round((projection.z - 0.99) * 10000);
+  } 
+}
+
+/* ==================== ANIMASI SESAR LEMBANG ==================== */
+// Variabel untuk animasi
+let animasiAktif = false;
+let timelineSesar = null;
+
+// Fungsi untuk memulai animasi sesar
+function mulaiAnimasiSesar() {
+  if (animasiAktif) return;
+  
+  animasiAktif = true;
+  document.getElementById('sesar-animation').style.display = 'block';
+  document.getElementById('sesar-button').innerHTML = '⏸️ Hentikan Animasi Sesar';
+  
+  // Reset posisi
+  gsap.set('#blok-kanan', { x: 0 });
+  gsap.set('#blok-kiri', { x: 0 });
+  
+  // Buat timeline animasi
+  timelineSesar = gsap.timeline({
+    repeat: -1,
+    yoyo: true,
+    repeatDelay: 1
+  });
+  
+  // Animasi pergerakan sesar
+  timelineSesar
+    .to('#blok-kanan', {
+      x: 20,
+      duration: 2,
+      ease: 'power1.inOut'
+    })
+    .to('#blok-kiri', {
+      x: -20,
+      duration: 2,
+      ease: 'power1.inOut'
+    }, 0)
+    .to('#garis-sesar', {
+      attr: { 'stroke-width': 6 },
+      duration: 0.5,
+      repeat: 3,
+      yoyo: true
+    }, 0)
+    .to('#arah-pergerakan', {
+      x: 10,
+      duration: 2,
+      ease: 'power1.inOut'
+    }, 0)
+    .to('#arah-pergerakan-bawah', {
+      x: -10,
+      duration: 2,
+      ease: 'power1.inOut'
+    }, 0);
+}
+
+// Fungsi untuk menghentikan animasi sesar
+function hentikanAnimasiSesar() {
+  if (!animasiAktif) return;
+  
+  animasiAktif = false;
+  document.getElementById('sesar-animation').style.display = 'none';
+  document.getElementById('sesar-button').innerHTML = '🔍 Lihat Ilustrasi Sesar Lembang';
+  
+  if (timelineSesar) {
+    timelineSesar.kill();
+    timelineSesar = null;
+  }
+}
+
+// Event listener untuk tombol sesar
+document.getElementById('sesar-button').addEventListener('click', () => {
+  if (animasiAktif) {
+    hentikanAnimasiSesar();
+  } else {
+    mulaiAnimasiSesar();
+  }
+});
+
+// Event listener untuk tombol info
+document.getElementById('info-button').addEventListener('click', () => {
+  const infoSesar = document.getElementById('info-sesar');
+  const infoDisplay = infoSesar.style.display;
+  infoSesar.style.display = infoDisplay === 'none' || infoDisplay === '' ? 'block' : 'none';
+});
+
+// Auto-hide info setelah 10 detik
+setTimeout(() => {
+  document.getElementById('info-sesar').style.display = 'none';
+}, 10000);
+
+/* RENDERING */
+let cameraAngle = new THREE.Vector3();
+const center = new THREE.Vector3(0,-500,0);
+function render(a) {
+  requestAnimationFrame(render);
+  
+  controls.update();
+  projectTooltips();
+  
+  // Update the compass
+  let cameraDirection = camera.getWorldDirection(cameraAngle);
+  let theta = Math.atan2(cameraDirection.x,cameraDirection.z);
+  elCompass.style.transform = `rotate(${(theta / (Math.PI * 2)) * 360}deg)`;
+  
+  renderer.render(scene, camera);
+}
+
+/* EVENTS */
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+window.addEventListener('resize', onWindowResize, false);
+requestAnimationFrame(render);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,556 @@
+/* ============================================
+   MOBILE COMPACT OPTIMIZATION
+   File: public/css/mobile-compact.css
+   Purpose: Make landing page compact on mobile
+   ============================================ */
+
+/* ============================================
+   HERO SECTION - MOBILE COMPACT
+   ============================================ */
+@media (max-width: 768px) {
+    /* Reduce hero height drastically */
+    section.min-h-screen {
+        min-height: auto !important;
+        padding-top: 3rem !important;
+        padding-bottom: 3rem !important;
+    }
+    
+    /* Compact hero padding */
+    .relative.max-w-7xl.mx-auto.px-4.py-20 {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+    
+    /* Reduce badge size */
+    .inline-flex.items-center.bg-white\/10.backdrop-blur-xl {
+        padding: 0.5rem 1rem !important;
+        margin-bottom: 1rem !important;
+        font-size: 0.75rem !important;
+    }
+    
+    /* Compact hero heading */
+    h1.text-5xl,
+    h1.sm\:text-6xl,
+    h1.lg\:text-7xl {
+        font-size: 2rem !important; /* 32px instead of 80px+ */
+        line-height: 1.2 !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Compact subtitle */
+    p.text-xl.sm\:text-2xl {
+        font-size: 0.95rem !important; /* 15px instead of 24px */
+        line-height: 1.4 !important;
+        margin-bottom: 1rem !important;
+        padding: 0 0.5rem !important;
+    }
+    
+    /* Compact CTA buttons */
+    .flex.flex-col.sm\:flex-row.gap-4 {
+        gap: 0.75rem !important;
+        padding-top: 1rem !important;
+    }
+    
+    .flex.flex-col.sm\:flex-row.gap-4 a {
+        padding: 0.75rem 1.5rem !important; /* Instead of px-8 py-4 */
+        font-size: 0.95rem !important;
+    }
+    
+    .flex.flex-col.sm\:flex-row.gap-4 svg {
+        width: 1rem !important;
+        height: 1rem !important;
+    }
+    
+}
+
+/* ============================================
+   STATS SECTION - MOBILE COMPACT
+   ============================================ */
+@media (max-width: 768px) {
+    /* Reduce stats section spacing */
+    .stats-variant-medium {
+        padding-top: 2rem !important;
+        gap: 1.5rem !important;
+    }
+    
+    .stats-variant-medium .grid.gap-10 {
+        gap: 1.5rem !important;
+    }
+    
+    /* Compact stats numbers */
+    .stats-variant-medium .stats-card .counter-number {
+        font-size: 2rem !important; /* 32px instead of 40px */
+    }
+    
+    .stats-variant-medium .stats-card .counter-number + span {
+        font-size: 2rem !important;
+    }
+    
+    /* Compact stats label */
+    .stats-variant-medium .stats-card .text-base {
+        font-size: 0.8rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    /* Compact underline */
+    .stats-variant-medium .h-1 {
+        height: 2px !important;
+        width: 50px !important;
+    }
+    
+    .stats-variant-medium .stats-card .mb-4 {
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .stats-variant-medium .stats-card .mb-2 {
+        margin-bottom: 0.25rem !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .stats-variant-medium .stats-card .counter-number {
+        font-size: 1.75rem !important; /* 28px */
+    }
+    
+    .stats-variant-medium .stats-card .counter-number + span {
+        font-size: 1.75rem !important;
+    }
+    
+    .stats-variant-medium .stats-card .text-base {
+        font-size: 0.75rem !important;
+    }
+}
+
+/* ============================================
+   CARA KERJA SECTION - MOBILE COMPACT
+   ============================================ */
+@media (max-width: 768px) {
+    /* Reduce section padding */
+    section.py-24 {
+        padding-top: 3rem !important;
+        padding-bottom: 3rem !important;
+    }
+    
+    /* Compact section header */
+    .text-center.mb-16 {
+        margin-bottom: 2rem !important;
+    }
+    
+    /* Compact badge */
+    .inline-flex.items-center.px-6.py-3 {
+        padding: 0.5rem 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Compact main heading */
+    h2.text-5xl,
+    h2.lg\:text-6xl,
+    h2.text-6xl,
+    h2.lg\:text-7xl {
+        font-size: 1.75rem !important; /* 28px instead of 60px+ */
+        line-height: 1.2 !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Compact description */
+    p.text-xl {
+        font-size: 0.9rem !important;
+        line-height: 1.4 !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Compact swiper cards */
+    .glass-card-light {
+        padding: 1.5rem !important;
+    }
+    
+    /* Compact step number */
+    .step-number {
+        width: 3rem !important;
+        height: 3rem !important;
+    }
+    
+    .step-number span.text-2xl {
+        font-size: 1.25rem !important;
+    }
+    
+    .step-number span.text-xs {
+        font-size: 0.65rem !important;
+    }
+    
+    /* Compact icon */
+    .floating-icon .w-20.h-20 {
+        width: 3.5rem !important;
+        height: 3.5rem !important;
+    }
+    
+    .floating-icon svg.w-10.h-10 {
+        width: 2rem !important;
+        height: 2rem !important;
+    }
+    
+    /* Compact card title */
+    .glass-card-light h3 {
+        font-size: 1.25rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    /* Compact card description */
+    .glass-card-light p {
+        font-size: 0.85rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Compact badges */
+    .glass-card-light .flex.flex-wrap.gap-2 span {
+        padding: 0.25rem 0.75rem !important;
+        font-size: 0.7rem !important;
+    }
+    
+    /* Compact swiper navigation */
+    .swiper-button-next,
+    .swiper-button-prev {
+        width: 35px !important;
+        height: 35px !important;
+    }
+    
+    .swiper-button-next:after,
+    .swiper-button-prev:after {
+        font-size: 14px !important;
+    }
+    
+    /* Compact swiper pagination */
+    .swiper-pagination-bullet {
+        width: 8px !important;
+        height: 8px !important;
+    }
+    
+    .swiper-pagination-bullet-active {
+        width: 20px !important;
+    }
+}
+
+/* ============================================
+   FEATURES SECTION - MOBILE COMPACT
+   ============================================ */
+@media (max-width: 768px) {
+    /* Compact feature cards */
+    .feature-card-3d .card-3d-content {
+        padding: 1.5rem !important;
+    }
+    
+    /* Compact icon container */
+    .icon-container .icon-inner {
+        width: 3.5rem !important;
+        height: 3.5rem !important;
+    }
+    
+    .icon-container svg.w-10.h-10 {
+        width: 2rem !important;
+        height: 2rem !important;
+    }
+    
+    /* Compact feature title */
+    .card-3d-content h3 {
+        font-size: 1.25rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    /* Compact feature description */
+    .card-3d-content p {
+        font-size: 0.85rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Compact stats grid */
+    .stats-grid {
+        padding: 1rem !important;
+        gap: 0.75rem !important;
+        margin: 1rem 0 !important;
+    }
+    
+    .stat-number {
+        font-size: 1.25rem !important;
+        margin-bottom: 0.25rem !important;
+    }
+    
+    .stat-label {
+        font-size: 0.65rem !important;
+    }
+}
+
+/* ============================================
+   RECENT ITEMS SECTION - MOBILE COMPACT
+   ============================================ */
+@media (max-width: 768px) {
+    /* Compact product cards */
+    .product-card-cimahi {
+        max-width: 100% !important;
+        height: 380px !important; /* Instead of 500px */
+    }
+    
+    /* Compact image section */
+    .product-imgBx {
+        height: 200px !important;
+    }
+    
+    .product-imgBx img {
+        width: 75% !important;
+    }
+    
+    /* Compact brand watermark */
+    .product-brand-cimahi {
+        font-size: 5em !important;
+    }
+    
+    /* Compact content section */
+    .product-contentBx {
+        height: 100px !important;
+        padding: 0 1rem !important;
+    }
+    
+    .product-card-cimahi:hover .product-contentBx {
+        height: 240px !important; /* Instead of 320px */
+    }
+    
+    /* Compact product title */
+    .product-contentBx h2 {
+        font-size: 1.1rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    /* Compact product info */
+    .product-stock h3,
+    .product-category h3 {
+        font-size: 0.7rem !important;
+        margin-right: 0.5rem !important;
+    }
+    
+    .stock-badge,
+    .stock-available-cimahi,
+    .stock-low-cimahi,
+    .category-badge-cimahi {
+        padding: 0.25rem 0.75rem !important;
+        font-size: 0.7rem !important;
+    }
+    
+    .product-location {
+        font-size: 0.75rem !important;
+        padding: 0.25rem 0 !important;
+    }
+    
+    .product-location svg {
+        width: 0.85rem !important;
+        height: 0.85rem !important;
+    }
+    
+    /* Compact price */
+    .product-price-cimahi {
+        font-size: 1.5rem !important;
+        margin: 0.75rem 0 0.5rem 0 !important;
+    }
+    
+    .product-price-cimahi span {
+        font-size: 0.75rem !important;
+    }
+    
+    /* Compact CTA button */
+    .product-cta-cimahi {
+        padding: 0.65rem 1.5rem !important;
+        font-size: 0.85rem !important;
+        margin-top: 0.5rem !important;
+    }
+    
+    /* Compact grid spacing */
+    .grid.gap-8.lg\:gap-10 {
+        gap: 1.5rem !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .product-card-cimahi {
+        height: 360px !important;
+    }
+    
+    .product-imgBx {
+        height: 180px !important;
+    }
+}
+
+/* ============================================
+   CTA SECTION - MOBILE COMPACT
+   ============================================ */
+@media (max-width: 768px) {
+    /* Compact CTA heading */
+    h2.text-4xl,
+    h2.lg\:text-5xl {
+        font-size: 1.5rem !important;
+        line-height: 1.3 !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Compact CTA description */
+    .text-center.mb-16 p.text-xl {
+        font-size: 0.9rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+    
+    /* Compact CTA buttons */
+    .text-center.mb-16 .flex.flex-col a {
+        padding: 0.75rem 1.5rem !important;
+        font-size: 0.95rem !important;
+    }
+    
+    .text-center.mb-16 svg.w-5.h-5 {
+        width: 1rem !important;
+        height: 1rem !important;
+    }
+    
+    /* Compact CTA section spacing */
+    .text-center.mb-16 {
+        margin-bottom: 2rem !important;
+    }
+}
+
+/* ============================================
+   GENERAL MOBILE OPTIMIZATIONS
+   ============================================ */
+@media (max-width: 768px) {
+    /* Reduce all section paddings */
+    .py-24 {
+        padding-top: 3rem !important;
+        padding-bottom: 3rem !important;
+    }
+    
+    .py-20 {
+        padding-top: 2.5rem !important;
+        padding-bottom: 2.5rem !important;
+    }
+    
+    /* Compact max-width containers */
+    .max-w-7xl {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    /* Compact gaps in grids */
+    .gap-8 {
+        gap: 1.5rem !important;
+    }
+    
+    .gap-10 {
+        gap: 2rem !important;
+    }
+    
+    /* Compact view all button */
+    .inline-flex.items-center.px-10.py-5 {
+        padding: 0.75rem 1.75rem !important;
+        font-size: 0.95rem !important;
+    }
+    
+    /* Reduce animated elements intensity on mobile */
+    .animate-float-slow,
+    .animate-float-slower,
+    .animate-pulse-slow {
+        animation-duration: 15s !important;
+    }
+    
+    /* Disable some 3D effects on mobile for performance */
+    .feature-card-3d:hover .card-3d-wrapper {
+        transform: none !important;
+    }
+}
+
+/* ============================================
+   EXTRA SMALL MOBILE (< 375px)
+   ============================================ */
+@media (max-width: 375px) {
+    /* Even more compact for very small screens */
+    h1.text-5xl {
+        font-size: 1.75rem !important;
+    }
+    
+    h2.text-5xl {
+        font-size: 1.5rem !important;
+    }
+    
+    .stats-variant-medium .stats-card .counter-number {
+        font-size: 1.5rem !important;
+    }
+    
+    .product-card-cimahi {
+        height: 340px !important;
+    }
+    
+    .product-imgBx {
+        height: 160px !important;
+    }
+}
+
+/* ============================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+@media (max-width: 768px) {
+    /* Reduce blur effects for better performance */
+    .blur-3xl {
+        filter: blur(40px) !important;
+        opacity: 0.15 !important;
+    }
+    
+    .backdrop-blur-xl {
+        backdrop-filter: blur(8px) !important;
+    }
+    
+    /* Simplify shadows on mobile */
+    .shadow-2xl {
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    /* Reduce animation complexity */
+    * {
+        will-change: auto !important;
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES FOR SPACING
+   ============================================ */
+@media (max-width: 768px) {
+    .mobile-compact-spacing {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+    
+    .mobile-compact-gap {
+        gap: 1rem !important;
+    }
+    
+    .mobile-compact-text {
+        font-size: 0.9rem !important;
+        line-height: 1.4 !important;
+    }
+    
+    .mobile-compact-heading {
+        font-size: 1.5rem !important;
+        line-height: 1.3 !important;
+    }
+}
+
+/* ============================================
+   LANDSCAPE MODE ADJUSTMENTS
+   ============================================ */
+@media (max-width: 768px) and (orientation: landscape) {
+    /* Further reduce heights in landscape */
+    .product-card-cimahi {
+        height: 320px !important;
+    }
+    
+    .product-imgBx {
+        height: 160px !important;
+    }
+    
+    section.min-h-screen {
+        min-height: auto !important;
+        padding: 2rem 0 !important;
+    }
+}

@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animasi Sesar Lembang - Realistis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            overflow-x: hidden;
+            color: white;
+        }
+        
+        #container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        #canvas {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.6);
+            background: #000;
+        }
+        
+        #controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        button {
+            padding: 15px 35px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        #startBtn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        #startBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(245, 87, 108, 0.5);
+        }
+        
+        #resetBtn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        #resetBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.5);
+        }
+        
+        #info {
+            margin-top: 20px;
+            text-align: center;
+            max-width: 900px;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            color: white;
+        }
+        
+        .description {
+            font-size: 15px;
+            line-height: 1.8;
+            opacity: 0.95;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 10px 25px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            margin-top: 15px;
+            font-size: 15px;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .magnitude {
+            color: #ff6b6b;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+        }
+        
+        .warning {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <canvas id="canvas"></canvas>
+        <div id="controls">
+            <button id="startBtn">🌋 Mulai Simulasi</button>
+            <button id="resetBtn">🔄 Reset</button>
+        </div>
+        <div id="info">
+            <div class="title">🌍 Simulasi Sesar Lembang - Patahan Strike-Slip</div>
+            <div class="description">
+                Sesar Lembang adalah patahan aktif sepanjang ~29 km di Jawa Barat yang melintasi area Lembang-Bandung. 
+                Merupakan patahan mendatar (strike-slip) dengan pergerakan horizontal sinistral (kiri). 
+                Potensi gempa: <span class="magnitude">Magnitudo 6.5 - 7.0</span>
+            </div>
+            <div class="status" id="statusText">Status: Siap Simulasi</div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const statusText = document.getElementById('statusText');
+        
+        canvas.width = 1200;
+        canvas.height = 700;
+        
+        let animating = false;
+        let frame = 0;
+        let displacement = 0;
+        let shakeIntensity = 0;
+        let cracks = [];
+        let particles = [];
+        let dust = [];
+        let debris = [];
+        
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 6;
+                this.vy = Math.random() * -5 - 3;
+                this.life = 1;
+                this.size = Math.random() * 4 + 2;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.3;
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.3;
+                this.rotation += this.rotationSpeed;
+                this.life -= 0.015;
+            }
+            
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = '#8B7355';
+                ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+                ctx.restore();
+            }
+        }
+        
+        class Dust {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = Math.random() * -1 - 0.5;
+                this.life = 1;
+                this.size = Math.random() * 2 + 1;
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.05;
+                this.life -= 0.005;
+            }
+            
+            draw() {
+                ctx.fillStyle = `rgba(180, 150, 120, ${this.life * 0.5})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function drawSky() {
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, 200);
+            if (frame > 80 && frame < 220) {
+                const quakeIntensity = Math.sin((frame - 80) / 140 * Math.PI);
+                skyGradient.addColorStop(0, `rgb(${135 + quakeIntensity * 50}, ${115 + quakeIntensity * 40}, ${85 + quakeIntensity * 20})`);
+                skyGradient.addColorStop(1, `rgb(${210 + quakeIntensity * 30}, ${180 + quakeIntensity * 30}, ${140 + quakeIntensity * 20})`);
+            } else {
+                skyGradient.addColorStop(0, '#87CEEB');
+                skyGradient.addColorStop(1, '#E0F6FF');
+            }
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, 1200, 200);
+        }
+        
+        function drawGround(offsetX, shake) {
+            // Rumput
+            const grassGradient = ctx.createLinearGradient(0, 200, 0, 240);
+            grassGradient.addColorStop(0, '#4A7C59');
+            grassGradient.addColorStop(1, '#3D6B4A');
+            ctx.fillStyle = grassGradient;
+            ctx.fillRect(0, 200 + shake, 600, 40);
+            
+            // Topsoil
+            const topsoilGradient = ctx.createLinearGradient(0, 240, 0, 320);
+            topsoilGradient.addColorStop(0, '#8B6F47');
+            topsoilGradient.addColorStop(1, '#6B5D4F');
+            ctx.fillStyle = topsoilGradient;
+            ctx.fillRect(0, 240 + shake, 600, 80);
+            
+            // Subsoil
+            ctx.fillStyle = '#5C4F41';
+            ctx.fillRect(0, 320 + shake, 600, 100);
+            
+            // Bedrock
+            const bedrockGradient = ctx.createLinearGradient(0, 420, 0, 700);
+            bedrockGradient.addColorStop(0, '#4A3F35');
+            bedrockGradient.addColorStop(1, '#1A1410');
+            ctx.fillStyle = bedrockGradient;
+            ctx.fillRect(0, 420 + shake, 600, 280);
+            
+            // Stratigrafi
+            for (let i = 0; i < 15; i++) {
+                ctx.strokeStyle = `rgba(0, 0, 0, ${0.2 + i * 0.02})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, 430 + i * 18 + shake);
+                ctx.lineTo(600, 430 + i * 18 + shake);
+                ctx.stroke();
+            }
+        }
+        
+        function drawGroundRight(offsetX, shake) {
+            // Rumput
+            const grassGradient = ctx.createLinearGradient(600, 200, 1200, 240);
+            grassGradient.addColorStop(0, '#4A7C59');
+            grassGradient.addColorStop(1, '#3D6B4A');
+            ctx.fillStyle = grassGradient;
+            ctx.fillRect(600, 200 + offsetX + shake, 600, 40);
+            
+            // Topsoil
+            const topsoilGradient = ctx.createLinearGradient(600, 240, 1200, 320);
+            topsoilGradient.addColorStop(0, '#8B6F47');
+            topsoilGradient.addColorStop(1, '#6B5D4F');
+            ctx.fillStyle = topsoilGradient;
+            ctx.fillRect(600, 240 + offsetX + shake, 600, 80);
+            
+            // Subsoil
+            ctx.fillStyle = '#5C4F41';
+            ctx.fillRect(600, 320 + offsetX + shake, 600, 100);
+            
+            // Bedrock
+            const bedrockGradient = ctx.createLinearGradient(600, 420, 1200, 700);
+            bedrockGradient.addColorStop(0, '#4A3F35');
+            bedrockGradient.addColorStop(1, '#1A1410');
+            ctx.fillStyle = bedrockGradient;
+            ctx.fillRect(600, 420 + offsetX + shake, 600, 280);
+            
+            // Stratigrafi
+            for (let i = 0; i < 15; i++) {
+                ctx.strokeStyle = `rgba(0, 0, 0, ${0.2 + i * 0.02})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(600, 430 + i * 18 + offsetX + shake);
+                ctx.lineTo(1200, 430 + i * 18 + offsetX + shake);
+                ctx.stroke();
+            }
+        }
+        
+        function drawFaultLine(shake) {
+            ctx.strokeStyle = '#1A0F08';
+            ctx.lineWidth = 12;
+            ctx.beginPath();
+            ctx.moveTo(600, 0);
+            ctx.lineTo(600, 700);
+            ctx.stroke();
+            
+            ctx.strokeStyle = '#0D0805';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(600, 200);
+            ctx.lineTo(600, 700);
+            ctx.stroke();
+        }
+        
+        function drawBuildings(offsetX, shake, damage) {
+            // Gedung kiri
+            const leftTilt = Math.sin(frame / 10) * damage * 0.05;
+            ctx.save();
+            ctx.translate(200, 200 + shake);
+            ctx.rotate(leftTilt);
+            
+            const buildingGradient1 = ctx.createLinearGradient(-50, -80, -50, 0);
+            buildingGradient1.addColorStop(0, '#607D8B');
+            buildingGradient1.addColorStop(1, '#455A64');
+            ctx.fillStyle = buildingGradient1;
+            ctx.fillRect(-50, -80, 100, 80);
+            ctx.strokeStyle = '#37474F';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(-50, -80, 100, 80);
+            
+            // Jendela
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 5; j++) {
+                    const windowDamage = damage > 0.5 && Math.random() > 0.6;
+                    ctx.fillStyle = windowDamage ? '#37474F' : '#FFE082';
+                    ctx.fillRect(-40 + j * 18, -70 + i * 22, 14, 16);
+                }
+            }
+            ctx.restore();
+            
+            // Gedung kanan
+            const rightTilt = Math.sin(frame / 8) * damage * 0.08;
+            ctx.save();
+            ctx.translate(850, 200 + offsetX + shake);
+            ctx.rotate(-rightTilt);
+            
+            const buildingGradient2 = ctx.createLinearGradient(-60, -100, -60, 0);
+            buildingGradient2.addColorStop(0, '#78909C');
+            buildingGradient2.addColorStop(1, '#546E7A');
+            ctx.fillStyle = buildingGradient2;
+            ctx.fillRect(-60, -100, 120, 100);
+            ctx.strokeStyle = '#37474F';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(-60, -100, 120, 100);
+            
+            // Jendela
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 5; j++) {
+                    const windowDamage = damage > 0.6 && Math.random() > 0.5;
+                    ctx.fillStyle = windowDamage ? '#37474F' : '#FFE082';
+                    ctx.fillRect(-50 + j * 22, -90 + i * 22, 16, 16);
+                }
+            }
+            ctx.restore();
+        }
+        
+        function drawTrees(offsetX, shake) {
+            // Pohon kiri
+            ctx.save();
+            ctx.translate(480, 200 + shake);
+            ctx.fillStyle = '#5D4E37';
+            ctx.fillRect(-10, -50, 20, 50);
+            ctx.fillStyle = '#2D5016';
+            ctx.beginPath();
+            ctx.arc(0, -55, 35, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+            
+            // Pohon kanan
+            ctx.save();
+            ctx.translate(720, 200 + offsetX + shake);
+            ctx.fillStyle = '#5D4E37';
+            ctx.fillRect(-10, -50, 20, 50);
+            ctx.fillStyle = '#2D5016';
+            ctx.beginPath();
+            ctx.arc(0, -55, 35, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+        
+        function drawCracks() {
+            cracks.forEach(crack => {
+                ctx.strokeStyle = `rgba(26, 15, 8, ${crack.alpha})`;
+                ctx.lineWidth = crack.width;
+                ctx.beginPath();
+                ctx.moveTo(crack.x1, crack.y1);
+                ctx.lineTo(crack.x2, crack.y2);
+                ctx.stroke();
+            });
+        }
+        
+        function addCrack(x, y) {
+            const angle = Math.random() * Math.PI * 0.6 - Math.PI * 0.3;
+            const length = Math.random() * 80 + 50;
+            cracks.push({
+                x1: x,
+                y1: y,
+                x2: x + Math.cos(angle) * length,
+                y2: y + Math.sin(angle) * length,
+                width: Math.random() * 4 + 2,
+                alpha: Math.random() * 0.6 + 0.4
+            });
+        }
+        
+        function drawWaves() {
+            if (frame > 80 && frame < 200) {
+                const waveProgress = (frame - 80) / 120;
+                
+                // P-wave
+                for (let i = 0; i < 4; i++) {
+                    const radius = waveProgress * 500 + i * 80;
+                    const alpha = (1 - waveProgress) * 0.4;
+                    ctx.strokeStyle = `rgba(100, 150, 255, ${alpha})`;
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(600, 400, radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                
+                // S-wave
+                for (let i = 0; i < 3; i++) {
+                    const radius = waveProgress * 350 + i * 70;
+                    const alpha = (1 - waveProgress) * 0.3;
+                    ctx.strokeStyle = `rgba(255, 100, 100, ${alpha})`;
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.arc(600, 400, radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        function drawInfo() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+            ctx.fillRect(10, 10, 340, 180);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(10, 10, 340, 180);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 18px Arial';
+            ctx.fillText('🌍 Sesar Lembang', 25, 35);
+            
+            ctx.font = '14px Arial';
+            const magnitude = Math.min(6.5 + displacement/25, 7.2);
+            
+            ctx.fillStyle = '#aaaaaa';
+            ctx.fillText('Tipe:', 25, 60);
+            ctx.fillStyle = 'white';
+            ctx.fillText('Strike-Slip Sinistral', 120, 60);
+            
+            ctx.fillStyle = '#aaaaaa';
+            ctx.fillText('Pergerakan:', 25, 82);
+            ctx.fillStyle = '#4fc3f7';
+            ctx.fillText(`${displacement.toFixed(2)} cm`, 120, 82);
+            
+            ctx.fillStyle = '#aaaaaa';
+            ctx.fillText('Magnitudo:', 25, 104);
+            ctx.fillStyle = magnitude > 7 ? '#ff4444' : '#ffaa44';
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText(`Mw ${magnitude.toFixed(2)}`, 120, 104);
+            
+            ctx.font = '14px Arial';
+            ctx.fillStyle = '#aaaaaa';
+            ctx.fillText('Intensitas:', 25, 126);
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fillText(`${shakeIntensity.toFixed(1)} MMI`, 120, 126);
+            
+            ctx.fillStyle = '#aaaaaa';
+            ctx.fillText('Kedalaman:', 25, 148);
+            ctx.fillStyle = 'white';
+            ctx.fillText('~12 km', 120, 148);
+            
+            ctx.fillStyle = '#aaaaaa';
+            ctx.fillText('Frame:', 25, 170);
+            ctx.fillStyle = '#90caf9';
+            ctx.fillText(`${frame}/350`, 120, 170);
+        }
+        
+        function animate() {
+            if (!animating) return;
+            
+            frame++;
+            
+            // Fase 1: Tekanan (0-80)
+            if (frame < 80) {
+                statusText.textContent = '⚡ Status: Akumulasi Tekanan Tektonik...';
+                displacement = Math.sin(frame / 15) * 3;
+                shakeIntensity = Math.random() * 0.8;
+                
+                if (frame % 10 === 0) {
+                    for (let i = 0; i < 2; i++) {
+                        dust.push(new Dust(600 + (Math.random() - 0.5) * 100, 250 + Math.random() * 150));
+                    }
+                }
+            }
+            // Fase 2: Gempa (80-220)
+            else if (frame < 220) {
+                statusText.textContent = '🚨 Status: GEMPA BUMI TERJADI!';
+                
+                const quakeProgress = (frame - 80) / 140;
+                displacement = quakeProgress * 50;
+                shakeIntensity = Math.sin(quakeProgress * Math.PI) * 12;
+                
+                if (frame % 2 === 0) {
+                    for (let i = 0; i < 8; i++) {
+                        particles.push(new Particle(600 + (Math.random() - 0.5) * 80, 220 + Math.random() * 150));
+                    }
+                    for (let i = 0; i < 15; i++) {
+                        dust.push(new Dust(600 + (Math.random() - 0.5) * 150, 220 + Math.random() * 200));
+                    }
+                }
+                
+                if (frame % 5 === 0 && cracks.length < 40) {
+                    addCrack(600 + (Math.random() - 0.5) * 200, 280 + Math.random() * 350);
+                }
+            }
+            // Fase 3: Aftershock (220-350)
+            else if (frame < 350) {
+                statusText.textContent = '⚠️ Status: Gempa Susulan...';
+                
+                const afterProgress = (frame - 220) / 130;
+                shakeIntensity = Math.sin(afterProgress * Math.PI * 4) * 3 * (1 - afterProgress);
+                
+                if (frame % 15 === 0) {
+                    for (let i = 0; i < 3; i++) {
+                        particles.push(new Particle(600 + (Math.random() - 0.5) * 60, 250 + Math.random() * 100));
+                    }
+                }
+            }
+            // Selesai
+            else {
+                statusText.textContent = '✅ Status: Simulasi Selesai';
+                animating = false;
+                shakeIntensity = 0;
+            }
+            
+            const shake = (Math.random() - 0.5) * shakeIntensity;
+            const damageLevel = Math.min(displacement / 50, 1);
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawSky();
+            drawWaves();
+            drawGround(0, shake);
+            drawGroundRight(displacement, shake);
+            drawFaultLine(shake);
+            drawCracks();
+            
+            particles = particles.filter(p => p.life > 0);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            
+            dust = dust.filter(d => d.life > 0);
+            dust.forEach(d => {
+                d.update();
+                d.draw();
+            });
+            
+            drawBuildings(displacement, shake, damageLevel);
+            drawTrees(displacement, shake);
+            drawInfo();
+            
+            if (animating) {
+                requestAnimationFrame(animate);
+            }
+        }
+        
+        function reset() {
+            animating = false;
+            frame = 0;
+            displacement = 0;
+            shakeIntensity = 0;
+            cracks = [];
+            particles = [];
+            dust = [];
+            debris = [];
+            statusText.textContent = 'Status: Siap Simulasi';
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawSky();
+            drawGround(0, 0);
+            drawGroundRight(0, 0);
+            drawFaultLine(0);
+            drawBuildings(0, 0, 0);
+            drawTrees(0, 0);
+            drawInfo();
+        }
+        
+        startBtn.addEventListener('click', () => {
+            if (!animating) {
+                animating = true;
+                animate();
+            }
+        });
+        
+        resetBtn.addEventListener('click', reset);
+        
+        reset();
+    </script>
+</body>
+</html>
